@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Button } from "./ui/button"
 import { MessageCircle, PlusCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import SubscriptionButton from "@/app/components/SubscriptionButton"
+import SubscriptionButton from "@/components/SubscriptionButton"
 
 type Props = {
   chats: DrizzleChat[]

@@ -1,8 +1,8 @@
 // ./app/chat/[chatId/page.tsx
 
-import ChatComponent from "@/app/components/ChatComponent"
-import ChatSideBar from "@/app/components/ChatSideBar"
-import PDFViewer from "@/app/components/PDFViewer"
+import ChatComponent from "@/components/ChatComponent"
+import ChatSideBar from "@/components/ChatSideBar"
+import PDFViewer from "@/components/PDFViewer"
 import { db } from "@/lib/db"
 import { chats } from "@/lib/db/schema"
 import { checkSubscription } from "@/lib/subscription"

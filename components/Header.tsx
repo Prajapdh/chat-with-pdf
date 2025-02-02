@@ -5,7 +5,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useUser, UserButton } from "@clerk/nextjs"
-import { Button } from "@/app/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 

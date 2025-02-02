@@ -9,9 +9,9 @@ import axios from "axios"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
-import { Progress } from "@/app/components/ui/progress"
-import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert"
-import { Button } from "@/app/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
 
 export default function FileUpload() {
   const { user } = useUser()
