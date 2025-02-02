@@ -1,3 +1,5 @@
+// ./app/pricing/page.tsx
+
 import Link from "next/link"
 import { Button } from "@/app/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"

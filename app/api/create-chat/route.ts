@@ -1,3 +1,5 @@
+// ./api/create-chat/route.ts
+
 import { db } from "@/lib/db"; // Import the database instance
 import { chats } from "@/lib/db/schema"; // Import the chats schema
 import { loadSupabaseIntoPinecone } from "@/lib/pinecone"; // Import the function to load data into Pinecone
@@ -6,7 +8,7 @@ import { auth } from '@clerk/nextjs/server'; // Import the authentication functi
 import { NextResponse } from "next/server"; // Import Next.js response helper
 
 // /api/create-chat
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   // Authenticate the user
   const { userId } = await auth();
   if (!userId) {

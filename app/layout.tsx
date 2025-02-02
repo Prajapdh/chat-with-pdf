@@ -1,11 +1,14 @@
+// ./app/layout.tsx
+
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
-import { ThemeProvider } from "@/app/components/theme-provider"
-import Header from "@/app/components/header"
-import Footer from "@/app/components/footer"
+import { ThemeProvider } from "@/app/components/ThemeProvider"
+import Header from "@/app/components/Header"
+import Footer from "@/app/components/Footer"
 import Providers from "@/app/components/Providers"
 import { Toaster } from "react-hot-toast"
+import type React from "react" // Added import for React
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -20,14 +23,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-background text-foreground`}>
         <ClerkProvider>
           <Providers>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <Header />
-              <main>{children}</main>
-              <Footer />
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+              </div>
               <Toaster />
             </ThemeProvider>
           </Providers>
@@ -36,3 +41,4 @@ export default function RootLayout({
     </html>
   )
 }
+

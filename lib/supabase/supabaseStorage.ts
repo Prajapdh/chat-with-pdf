@@ -1,5 +1,6 @@
 import { supabase } from './client';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 function getStorage(){
     const {storage} = supabase;
@@ -13,48 +14,52 @@ type UploadProps = {
 }
 
 export async function uploadToSupabase({file, userId, onProgress}:UploadProps){
-    let fileName = file.name;
+    const fileName = file.name;
     const fileExt = fileName.slice(fileName.lastIndexOf('.')+1);
-    fileName = uuidv4();
-    const path = `${userId}/${fileName}.${fileExt}`;
+    const path = `${userId}/${uuidv4()}.${fileExt}`;
 
     const storage = getStorage();
 
-    // const {data, error} = await storage
-    //     .from('chatpdfsaas')
-    //     .upload(path, file,{
-    //         onUploadProgress: (progressEvent) =>{
-    //             const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-    //             onProgress(progress);
-    //         }
-    //     });
-
-    const {data, error} = await storage
-    .from('chatpdfsaas')
-    .upload(path, file);
-        
-    console.log('inside uploadToSupabase');
-    
-    if(error){
-        return {fileName: null, fileKey: null, error:"Error uploading file"};
+    // Get the upload URL from Supabase
+    const { data, error: urlError } = await storage
+        .from('chatpdfsaas')
+        .createSignedUploadUrl(path);
+    const { signedUrl } = data || {};
+    if (urlError || !signedUrl) {
+    return { fileName: null, fileKey: null, error: "Error getting upload URL" };
     }
-    
-    const fileKey = data?.path;
-    
-    return {fileName, fileKey, error: null};
+
+    // Use Axios to upload the file with progress tracking
+    try {
+    await axios.put(signedUrl, file, {
+        headers: {
+        'Content-Type': file.type,
+        },
+        onUploadProgress: (progressEvent) => {
+        const total = progressEvent.total || 1; // default to 1 if total is undefined
+        const progress = Math.round((progressEvent.loaded * 100) / total);
+        onProgress(progress);
+        },
+    });
+
+    return { fileName, fileKey: path, error: null };
+    } catch (error) {
+    console.error('Upload error:', error);
+    return { fileName: null, fileKey: null, error: "Error uploading file" };
+    }
 }
 
 // Function to delete a file from Supabase storage
 export async function deleteFromSupabase(fileKey:string){
     const storage = getStorage();
-    const {data, error} = await storage
+    const {error} = await storage
         .from('chatpdfsaas')
         .remove([fileKey]);
     
     if(error){
         return {error: "Error deleting file"};
     }
-
+    console.log(`Deleted file: ${fileKey}`);
     return {error: null};
 }
 

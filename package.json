@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.1.9",
     "@clerk/nextjs": "^6.10.3",
     "@langchain/community": "^0.3.28",
     "@langchain/core": "^0.3.37",
@@ -19,6 +20,7 @@
     "@radix-ui/react-progress": "^1.1.1",
     "@radix-ui/react-scroll-area": "^1.2.2",
     "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.1.7",
     "@supabase/ssr": "^0.5.2",
     "@tanstack/react-query": "^5.65.1",
     "ai": "^4.1.16",
@@ -40,6 +42,7 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.5",
     "react-hot-toast": "^2.5.1",
+    "stripe": "^17.6.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.5"

@@ -29,13 +29,14 @@ export async function loadSupabaseIntoPinecone(fileKey: string) {
   if (!fileName) {
     throw new Error("could not download from supabase");
   }
-  console.log("loading pdf into memory" + fileName);
+  console.log("loading pdf into memory: " + fileName);
   const loader = new PDFLoader(fileName);
   const pages = (await loader.load()) as PDFPage[];
 
   // 2. split and segment the pdf
   const documents = await Promise.all(pages.map(prepareDocument));
-
+  // console.log("splitting pdf into documents: ", documents);
+  
   // 3. vectorise and embed individual documents
   const vectors = await Promise.all(documents.flat().map(embedDocument));
 
@@ -45,10 +46,35 @@ export async function loadSupabaseIntoPinecone(fileKey: string) {
   const namespace = pineconeIndex.namespace(convertToAscii(fileKey));
 
   console.log("inserting vectors into pinecone");
-  await namespace.upsert(vectors);
+  const maxBatchSize = 4000000; // 4MB in bytes
+  let batchSize = 50;
+  const batches = splitIntoBatches(vectors, batchSize);
+
+  for (const batch of batches) {
+    let currentBatch = batch;
+    while (estimateBatchSize(currentBatch) > maxBatchSize) {
+      batchSize = Math.floor(batchSize / 2);
+      currentBatch = splitIntoBatches(currentBatch, batchSize)[0];
+    }
+    await namespace.upsert(currentBatch);
+  }
+
 
   return documents[0];
 }
+
+function splitIntoBatches(vectors: PineconeRecord[], batchSize: number = 50) {
+  const batches = [];
+  for (let i = 0; i < vectors.length; i += batchSize) {
+    batches.push(vectors.slice(i, i + batchSize));
+  }
+  return batches;
+}
+
+function estimateBatchSize(batch: PineconeRecord[]): number {
+  return JSON.stringify(batch).length;
+}
+
 
 async function embedDocument(doc: Document) {
   try {
@@ -75,7 +101,8 @@ export const truncateStringByBytes = (str: string, bytes: number) => {
 };
 
 async function prepareDocument(page: PDFPage) {
-  let { pageContent, metadata } = page;
+  let pageContent = page.pageContent;
+  const metadata = page.metadata;
   pageContent = pageContent.replace(/\n/g, "");
   // split the docs
   const splitter = new RecursiveCharacterTextSplitter();
@@ -84,7 +111,7 @@ async function prepareDocument(page: PDFPage) {
       pageContent,
       metadata: {
         pageNumber: metadata.loc.pageNumber,
-        text: truncateStringByBytes(pageContent, 36000),
+        text: truncateStringByBytes(pageContent, 3000),
       },
     }),
   ]);

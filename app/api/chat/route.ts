@@ -1,73 +1,86 @@
-// import { Configuration, OpenAIApi } from "openai-edge";
-// import { Message, OpenAIStream, StreamingTextResponse } from "ai";
-// import { getContext } from "@/lib/context";
-// import { db } from "@/lib/db";
-// import { chats, messages as _messages } from "@/lib/db/schema";
-// import { eq } from "drizzle-orm";
-// import { NextResponse } from "next/server";
+// ./api/chat/route.ts
 
-// export const runtime = "edge";
+import { openai } from '@ai-sdk/openai';
+import { Message, streamText } from "ai";
+import { getContext } from "@/lib/context";
+import { db } from "@/lib/db";
+import { chats, messages as _messages } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
 
-// const config = new Configuration({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
-// const openai = new OpenAIApi(config);
+export const runtime = "edge";
 
-// export async function POST(req: Request) {
-//   try {
-//     const { messages, chatId } = await req.json();
-//     const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
-//     if (_chats.length != 1) {
-//       return NextResponse.json({ error: "chat not found" }, { status: 404 });
-//     }
-//     const fileKey = _chats[0].fileKey;
-//     const lastMessage = messages[messages.length - 1];
-//     const context = await getContext(lastMessage.content, fileKey);
+export async function POST(req: Request) {
+  try {
+    const { messages, chatId } = await req.json();
+    const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+    if (_chats.length != 1) {
+      return NextResponse.json({ error: "chat not found" }, { status: 404 });
+    }
+    const fileKey = _chats[0].fileKey;
+    const lastMessage = messages[messages.length - 1];
+    console.log(`Last Message: ${lastMessage.content}`);
+    const contextObject = await getContext(lastMessage.content, fileKey);
+    const context = JSON.stringify(contextObject, null, 2); // Converts the object to a pretty-printed JSON string
+    console.log(`Context: ${context}`);
 
-//     const prompt = {
-//       role: "system",
-//       content: `AI assistant is a brand new, powerful, human-like artificial intelligence.
-//       The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
-//       AI is a well-behaved and well-mannered individual.
-//       AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.
-//       AI has the sum of all knowledge in their brain, and is able to accurately answer nearly any question about any topic in conversation.
-//       AI assistant is a big fan of Pinecone and Vercel.
-//       START CONTEXT BLOCK
-//       ${context}
-//       END OF CONTEXT BLOCK
-//       AI assistant will take into account any CONTEXT BLOCK that is provided in a conversation.
-//       If the context does not provide the answer to question, the AI assistant will say, "I'm sorry, but I don't know the answer to that question".
-//       AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
-//       AI assistant will not invent anything that is not drawn directly from the context.
-//       `,
-//     };
+    const prompt = {
+      role: "system",
+      content: `You are an AI assistant designed to help users interact with and extract information from uploaded PDF documents. 
+      You specialize in document comprehension, summarization, and information retrieval using embeddings.
+    
+      **Key Behaviors and Instructions:**
+      - If the user has already uploaded a file and asks, **"What is this file about?"**, you must retrieve the embeddings and generate a **concise and informative summary** of the document.
+      - If the user asks a question related to the document, retrieve the most relevant information from the embeddings and provide a direct answer.
+      - If the user has not uploaded a file, request them to do so before proceeding.
+      - If the document content does not contain the requested information, respond with: **"I'm sorry, but I couldn't find that information in the document."**
+      - Never ask the user to re-upload the document once embeddings have been created; assume you always have access to it.
+      - For long documents, summarize key sections instead of attempting to include all details at once.
+    
+      **Contextual Data Block:**
+      START CONTEXT BLOCK
+      ${context}
+      END CONTEXT BLOCK
+    
+      The AI assistant will always use the CONTEXT BLOCK to retrieve embeddings and provide accurate answers. It will not request re-uploading once a file has been successfully processed.
+      `,
+    };
+    
+    const systemPrompt = prompt.content;
+    console.log(`System Prompt: ${systemPrompt}`);
 
-//     const response = await openai.createChatCompletion({
-//       model: "gpt-3.5-turbo",
-//       messages: [
-//         prompt,
-//         ...messages.filter((message: Message) => message.role === "user"),
-//       ],
-//       stream: true,
-//     });
-//     const stream = OpenAIStream(response, {
-//       onStart: async () => {
-//         // save user message into db
-//         await db.insert(_messages).values({
-//           chatId,
-//           content: lastMessage.content,
-//           role: "user",
-//         });
-//       },
-//       onCompletion: async (completion) => {
-//         // save ai message into db
-//         await db.insert(_messages).values({
-//           chatId,
-//           content: completion,
-//           role: "system",
-//         });
-//       },
-//     });
-//     return new StreamingTextResponse(stream);
-//   } catch (error) {}
-// }
+    let isFirstChunk = true;
+    const result = await streamText({
+      model: openai('gpt-3.5-turbo'),
+      system: systemPrompt,
+      messages: messages.filter((message:Message) => message.role === 'user'),
+      onChunk: async () => {
+        if (isFirstChunk) {
+          isFirstChunk = false;
+          // Save user message into the database
+          await db.insert(_messages).values({
+            chatId: chatId,
+            content: lastMessage.content,
+            role: 'user',
+          });
+        }
+        // Process each chunk as it arrives
+        // For example, you can stream the chunk to the client here
+      },
+      onFinish: async (completion) => {
+        // Save AI message into the database
+        await db.insert(_messages).values({
+          chatId: chatId,
+          content: completion.text,
+          role: 'system',
+        });
+      },
+    });
+
+    return result.toDataStreamResponse();
+
+    } catch (error) {
+      console.error('Error:', error);
+      return NextResponse.json({ error: "An error occurred" }, { status: 500 });
+    }
+}
