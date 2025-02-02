@@ -3,10 +3,10 @@
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
-import { ThemeProvider } from "./components/ThemeProvider"
-import Header from "./components/Header"
-import Footer from "./components/Footer"
-import Providers from "./components/Providers"
+import { ThemeProvider } from "@/app/components/ThemeProvider"
+import Header from "@/app/components/Header"
+import Footer from "@/app/components/Footer"
+import Providers from "@/app/components/Providers"
 import { Toaster } from "react-hot-toast"
 import type React from "react" // Added import for React
 

@@ -1,8 +1,8 @@
 // ./app/chat/[chatId/page.tsx
 
-import ChatComponent from "../../components/ChatComponent"
-import ChatSideBar from "../../components/ChatSideBar"
-import PDFViewer from "../../components/PDFViewer"
+import ChatComponent from "@/app/components/ChatComponent"
+import ChatSideBar from "@/app/components/ChatSideBar"
+import PDFViewer from "@/app/components/PDFViewer"
 import { db } from "@/lib/db"
 import { chats } from "@/lib/db/schema"
 import { checkSubscription } from "@/lib/subscription"
@@ -30,7 +30,7 @@ const ChatPage = async ({ params }: Props) => {
   }
 
   const currentChat = _chats.find((chat) => chat.id === Number.parseInt(chatId))
-  const isPro = await checkSubscription(userId) 
+  const isPro = await checkSubscription(userId)
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-3.5rem)]">

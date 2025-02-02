@@ -1,6 +1,6 @@
-import { db } from "../../../lib/db";
-import { userSubscriptions } from "../../../lib/db/schema";
-import { stripe } from "../../../lib/stripe";
+import { db } from "@/lib/db";
+import { userSubscriptions } from "@/lib/db/schema";
+import { stripe } from "@/lib/stripe";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";

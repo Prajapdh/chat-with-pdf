@@ -1,6 +1,6 @@
 // ./app/components/MessageList.tsx
 
-import { cn } from "../../lib/utils"
+import { cn } from "@/lib/utils"
 import type { Message } from "ai/react"
 import { Loader2 } from "lucide-react"
 
