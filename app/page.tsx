@@ -1,12 +1,12 @@
 // ./app/page.tsx
 
 import Link from "next/link"
-import { Button } from "@/app/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
+import { Button } from "./components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card"
 import { MessageSquare, FileText, Zap, Shield, ArrowRight, Upload } from "lucide-react"
 import { auth } from "@clerk/nextjs/server"
 import { checkSubscription } from "@/lib/subscription"
-import SubscriptionButton from "@/app/components/SubscriptionButton"
+import SubscriptionButton from "./components/SubscriptionButton"
 import { db } from "@/lib/db"
 import { chats } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"

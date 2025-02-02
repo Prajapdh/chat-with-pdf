@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkAndUpdateUploadLimit } from "@/lib/subscription";
+import { checkAndUpdateUploadLimit } from "../../../lib/subscription";
 import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {

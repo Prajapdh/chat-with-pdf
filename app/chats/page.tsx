@@ -1,10 +1,10 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
-import { db } from "@/lib/db"
-import { chats } from "@/lib/db/schema"
+import { db } from "../../lib/db"
+import { chats } from "../../lib/db/schema"
 import { eq, desc } from "drizzle-orm"
 import Link from "next/link"
-import { Button } from "@/app/components/ui/button"
+import { Button } from "../components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
 import { MessageCircle } from "lucide-react"
 

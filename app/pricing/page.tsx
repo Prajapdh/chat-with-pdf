@@ -1,11 +1,11 @@
 // ./app/pricing/page.tsx
 
 import Link from "next/link"
-import { Button } from "@/app/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table"
+import { Button } from "../components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table"
 import { Check, X } from "lucide-react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/app/components/ui/accordion"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion"
 
 const PricingPage = () => {
   const plans = [
@@ -124,8 +124,8 @@ const PricingPage = () => {
         <AccordionItem value="item-3">
           <AccordionTrigger>Do you offer refunds?</AccordionTrigger>
           <AccordionContent>
-            We offer a 14-day money-back guarantee for Pro subscriptions. If you're not satisfied, contact our support
-            team within 14 days of your purchase for a full refund.
+            {`We offer a 14-day money-back guarantee for Pro subscriptions. If you're not satisfied, contact our support
+            team within 14 days of your purchase for a full refund.`}
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-4">
@@ -140,7 +140,7 @@ const PricingPage = () => {
       {/* Final CTA */}
       <div className="text-center mt-20">
         <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-        <p className="text-xl mb-8">Choose the plan that's right for you and start chatting with your PDFs today!</p>
+        <p className="text-xl mb-8">{`Choose the plan that's right for you and start chatting with your PDFs today!`}</p>
         <Button size="lg" asChild>
           <Link href="/signup">Sign Up Now</Link>
         </Button>

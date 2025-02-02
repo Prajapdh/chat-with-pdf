@@ -2,9 +2,9 @@
 
 import { openai } from '@ai-sdk/openai';
 import { Message, streamText } from "ai";
-import { getContext } from "@/lib/context";
-import { db } from "@/lib/db";
-import { chats, messages as _messages } from "@/lib/db/schema";
+import { getContext } from "../../../lib/context";
+import { db } from "../../../lib/db";
+import { chats, messages as _messages } from "../../../lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
