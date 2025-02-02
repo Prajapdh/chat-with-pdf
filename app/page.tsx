@@ -44,7 +44,10 @@ export default async function Home() {
               </Link>
             </Button>
           )}
-          <SubscriptionButton isPro={isPro} />
+          {userId && (
+            <SubscriptionButton isPro={isPro} />
+          )}
+          
         </div>
       </section>
 

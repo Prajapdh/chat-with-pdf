@@ -6,15 +6,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Check, X } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { auth } from "@clerk/nextjs/server"
+import { checkSubscription } from "@/lib/subscription"
 
-const PricingPage = () => {
+const PricingPage = async () => {
+  const { userId } = await auth();
+  const isPro = userId ? await checkSubscription(userId) : false;
   const plans = [
     {
       name: "Free",
       price: "$0",
       description: "For casual users",
       features: ["5 PDF uploads per month", "Basic chat functionality", "Standard processing speed"],
-      cta: "Get Started",
+      cta: isPro ? "Get Started" : "Current Plan",
       ctaLink: "/signup",
     },
     {
@@ -27,7 +31,7 @@ const PricingPage = () => {
         "Priority processing speed",
         "API access",
       ],
-      cta: "Upgrade to Pro",
+      cta: isPro ? "Current Plan" : "Upgrade to Pro",
       ctaLink: "/signup?plan=pro",
     },
   ]
@@ -36,10 +40,10 @@ const PricingPage = () => {
     <div className="container mx-auto px-4 py-20">
       <h1 className="text-4xl font-bold text-center mb-12">Choose Your Plan</h1>
 
-      {/* Pricing Cards */}
-      <div className="grid md:grid-cols-2 gap-8 mb-20">
+     {/* Pricing Cards */}
+     <div className="grid md:grid-cols-2 gap-8 mb-20">
         {plans.map((plan, index) => (
-          <Card key={index} className={plan.name === "Pro" ? "border-primary" : ""}>
+          <Card key={index} className={`${(isPro && plan.name === "Pro") || (!isPro && plan.name === "Free") ? "border-primary" : ""}`}>
             <CardHeader>
               <CardTitle className="text-2xl">{plan.name}</CardTitle>
               <CardDescription>{plan.description}</CardDescription>
@@ -59,7 +63,7 @@ const PricingPage = () => {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" asChild>
+              <Button className="w-full" asChild disabled={(isPro && plan.name === "Pro") || (!isPro && plan.name === "Free")}>
                 <Link href={plan.ctaLink}>{plan.cta}</Link>
               </Button>
             </CardFooter>

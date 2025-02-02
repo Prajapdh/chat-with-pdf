@@ -7,7 +7,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-const return_url = process.env.NEXT_BASE_URL + "/";
+const return_url = `${process.env.NEXT_BASE_URL}/`;
+
 
 export async function GET() {
   try {
@@ -61,6 +62,7 @@ export async function GET() {
     });
     return NextResponse.json({ url: stripeSession.url });
   } catch (error) {
+    console.log(`return url: ${return_url}`);
     console.log("stripe error", error);
     return new NextResponse("internal server error: stripe", { status: 500 });
   }
