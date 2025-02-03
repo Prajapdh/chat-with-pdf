@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkAndUpdateUploadLimit } from "@/lib/subscription";
+import { checkUploadLimit } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const MAX_FREE_UPLOADS = 5; //
-  const result = await checkAndUpdateUploadLimit(userId);
+  const result = await checkUploadLimit(userId);
   console.log()
 //   return NextResponse.json(result);
   return NextResponse.json({

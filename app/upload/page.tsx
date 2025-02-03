@@ -7,7 +7,6 @@ import FileUpload from "@/components/FileUpload"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { checkAndUpdateUploadLimit, checkSubscription } from "@/lib/subscription"
 import { MessageCircle, Upload, HelpCircle } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -19,8 +18,6 @@ export default async function UploadPage() {
   }
 
   const userChats = await db.select().from(chats).where(eq(chats.userId, userId)).orderBy(desc(chats.createdAt))
-  const canUpload = await checkAndUpdateUploadLimit(userId)
-  const isPro = await checkSubscription(userId)
 
   return (
     <div className="container mx-auto p-4 py-8">
@@ -97,18 +94,6 @@ export default async function UploadPage() {
         </div>
       </div>
 
-      {!isPro && (
-        <div className="mt-12 text-center">
-          <p className="text-muted-foreground mb-2">
-            {canUpload
-              ? `You have ${5 - userChats.length} uploads remaining this month.`
-              : "You have reached your monthly upload limit."}
-          </p>
-          <Button asChild>
-            <Link href="/pricing">Upgrade to Pro for unlimited uploads</Link>
-          </Button>
-        </div>
-      )}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>

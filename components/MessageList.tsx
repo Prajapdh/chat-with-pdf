@@ -3,6 +3,8 @@
 import { cn } from "@/lib/utils"
 import type { Message } from "ai/react"
 import { Loader2 } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 type Props = {
   isLoading: boolean
@@ -34,7 +36,13 @@ const MessageList = ({ messages, isLoading }: Props) => {
               "bg-muted": message.role === "assistant",
             })}
           >
-            <p className="text-sm">{message.content}</p>
+            {/* Render markdown properly */}
+            <ReactMarkdown
+              className="text-sm"
+              remarkPlugins={[remarkGfm]}
+            >
+              {message.content}
+            </ReactMarkdown>
           </div>
         </div>
       ))}

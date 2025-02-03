@@ -22,32 +22,54 @@ export async function POST(req: Request) {
     console.log(`Last Message: ${lastMessage.content}`);
     const contextObject = await getContext(lastMessage.content, fileKey);
     const context = JSON.stringify(contextObject, null, 2); // Converts the object to a pretty-printed JSON string
-    console.log(`Context: ${context}`);
+    // console.log(`Context: ${context}`);
 
+    // const prompt = {
+    //   role: "system",
+    //   content: `AI assistant is a brand new, powerful, human-like artificial intelligence.
+    //   The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
+    //   AI is a well-behaved and well-mannered individual.
+    //   AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.
+    //   AI has the sum of all knowledge in their brain, and is able to accurately answer nearly any question about any topic in conversation.
+    //   AI assistant is a big fan of Pinecone and Vercel.
+    //   START CONTEXT BLOCK
+    //   ${context}
+    //   END OF CONTEXT BLOCK
+    //   AI assistant will take into account any CONTEXT BLOCK that is provided in a conversation.
+    //   If the context does not provide the answer to question, the AI assistant will say, "I'm sorry, but I don't know the answer to that question".
+    //   AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
+    //   AI assistant will not invent anything that is not drawn directly from the context.
+    //   `,
+    // };
     const prompt = {
       role: "system",
-      content: `You are an AI assistant designed to help users interact with and extract information from uploaded PDF documents. 
-      You specialize in document comprehension, summarization, and information retrieval using embeddings.
+      content: `You are an intelligent AI assistant designed to help users analyze and extract insights from PDF documents. 
+      Your primary role is to provide relevant and accurate responses based on the content of the uploaded document. 
+      If a user's question relates to information found in the PDF, retrieve and summarize the relevant details.
     
-      **Key Behaviors and Instructions:**
-      - If the user has already uploaded a file and asks, **"What is this file about?"**, you must retrieve the embeddings and generate a **concise and informative summary** of the document.
-      - If the user asks a question related to the document, retrieve the most relevant information from the embeddings and provide a direct answer.
-      - If the user has not uploaded a file, request them to do so before proceeding.
-      - If the document content does not contain the requested information, respond with: **"I'm sorry, but I couldn't find that information in the document."**
-      - Never ask the user to re-upload the document once embeddings have been created; assume you always have access to it.
-      - For long documents, summarize key sections instead of attempting to include all details at once.
+      If the document does not contain enough information to fully answer the question:
+      - Acknowledge the limitation.
+      - Provide general guidance based on your broader knowledge.
+      - Suggest what additional information the user might need or where they could find it.
     
-      **Contextual Data Block:**
+      Maintain a conversational and engaging tone, adapting to the user's queries naturally. Be concise, yet insightful.
+    
       START CONTEXT BLOCK
       ${context}
-      END CONTEXT BLOCK
+      END OF CONTEXT BLOCK
     
-      The AI assistant will always use the CONTEXT BLOCK to retrieve embeddings and provide accurate answers. It will not request re-uploading once a file has been successfully processed.
-      `,
+      When responding:
+      - If the CONTEXT BLOCK provides the answer, refer to it directly.
+      - If the answer requires additional context beyond the document, say: 
+        "Based on the provided document, here’s what I found: [answer]. For a more complete response, consider [additional insights, external references, or general guidance]."
+      - If the question cannot be answered from the document but is general, use your broader knowledge to provide useful advice.
+    
+      Never fabricate information that isn’t present in the document. Always clarify the source of your answer.
+      `
     };
     
     const systemPrompt = prompt.content;
-    console.log(`System Prompt: ${systemPrompt}`);
+    // console.log(`System Prompt: ${systemPrompt}`);
 
     let isFirstChunk = true;
     const result = await streamText({

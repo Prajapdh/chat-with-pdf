@@ -19,7 +19,7 @@ const PricingPage = async () => {
       description: "For casual users",
       features: ["5 PDF uploads per month", "Basic chat functionality", "Standard processing speed"],
       cta: isPro ? "Get Started" : "Current Plan",
-      ctaLink: "/signup",
+      ctaLink: "/upload",
     },
     {
       name: "Pro",
@@ -32,7 +32,7 @@ const PricingPage = async () => {
         "API access",
       ],
       cta: isPro ? "Current Plan" : "Upgrade to Pro",
-      ctaLink: "/signup?plan=pro",
+      ctaLink: "/",
     },
   ]
 

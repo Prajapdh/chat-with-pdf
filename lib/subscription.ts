@@ -38,7 +38,7 @@ export const checkSubscription = async (userId: string) => {
   return !!isValid;
 };
 
-export const checkAndUpdateUploadLimit = async (userId: string) => {
+export const checkUploadLimit = async (userId: string) => {
   const _userUploads = await db
     .select()
     .from(userUploads)
@@ -69,15 +69,6 @@ export const checkAndUpdateUploadLimit = async (userId: string) => {
     }
 
     const canUpload = userUpload.uploadCount < MAX_FREE_UPLOADS;
-
-    if (canUpload) {
-      // Increment upload count
-      await db
-        .update(userUploads)
-        .set({ uploadCount: userUpload.uploadCount + 1 })
-        .where(eq(userUploads.userId, userId));
-      userUpload.uploadCount += 1;
-    }
 
     return {
       canUpload,
